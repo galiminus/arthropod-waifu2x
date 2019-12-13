@@ -33,13 +33,12 @@ module ArthropodWaifu2x
     end
 
     def download_input!
-      unless File.exists? input_path
-        call_command("curl #{Shellwords.escape(image_url)} -s -o #{input_path}")
-      end
+      call_command("curl #{Shellwords.escape(image_url)} -s -o #{input_path}")
     end
 
     def perform_scaling!
-      call_command("th #{waifu_bin} -m scale -i #{input_path} -o #{scaled_path}")
+      call_command("convert #{input_path} #{converted_path}")
+      call_command("th #{waifu_bin} -m scale -i #{converted_path} -o #{scaled_path}")
       "#{root_dir}/#{SecureRandom.uuid}#{File.extname(image_url)}".tap do |key|
         upload(scaled_path, key)
       end
@@ -50,11 +49,15 @@ module ArthropodWaifu2x
     end
 
     def input_path
-      Shellwords.escape("#{@wdir}/input#{File.extname(image_url)}")
+      Shellwords.escape("#{@wdir}/input")
+    end
+
+    def converted_path
+      Shellwords.escape("#{@wdir}/converted.png")
     end
 
     def scaled_path
-      Shellwords.escape("#{@wdir}/scaled#{File.extname(image_url)}")
+      Shellwords.escape("#{@wdir}/scaled.png")
     end
 
     def call_command(command)
