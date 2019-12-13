@@ -41,7 +41,7 @@ module ArthropodWaifu2x
       Dir.chdir waifu do
         call_command("th #{waifu_bin} -m scale -i #{converted_path} -o #{scaled_path}")
       end
-      "#{root_dir}/#{SecureRandom.uuid}#{File.extname(image_url)}".tap do |key|
+      Pathname.new(root_dir).join("#{SecureRandom.uuid}.png").to_s.tap do |key|
         upload(scaled_path, key)
       end
     end
@@ -85,9 +85,8 @@ module ArthropodWaifu2x
         storage.files.create({
           key: key,
           body: file,
-          public: true
         })
-      end.public_url
+      end
     end
   end
 end
