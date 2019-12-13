@@ -45,7 +45,7 @@ module ArthropodWaifu2x
     end
 
     def waifu_bin
-      Shellwords.escape(Pathname.new(waifu).join("waifu2x").to_s)
+      Shellwords.escape(Pathname.new(waifu).join("waifu2x.lua").to_s)
     end
 
     def input_path
