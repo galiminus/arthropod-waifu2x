@@ -38,7 +38,9 @@ module ArthropodWaifu2x
 
     def perform_scaling!
       call_command("convert #{input_path} #{converted_path}")
-      call_command("th #{waifu_bin} -m scale -i #{converted_path} -o #{scaled_path}")
+      Dir.chdir waifu do
+        call_command("th #{waifu_bin} -m scale -i #{converted_path} -o #{scaled_path}")
+      end
       "#{root_dir}/#{SecureRandom.uuid}#{File.extname(image_url)}".tap do |key|
         upload(scaled_path, key)
       end
