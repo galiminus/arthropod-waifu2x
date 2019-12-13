@@ -6,17 +6,14 @@ require 'pathname'
 
 module ArthropodWaifu2x
   class Scaler
-    attr_reader :image_url, :aws_access_key_id, :aws_secret_access_key, :region, :endpoint, :host, :bucket, :root_dir, :waifu
+    attr_reader :image_url, :access_key_id, :secret_access_key, :region, :bucket, :waifu
 
-    def initialize(image_url:, aws_access_key_id:, aws_secret_access_key:, region:, endpoint:, host:, bucket:, root_dir:, waifu:)
+    def initialize(image_url:, access_key_id:, secret_access_key:, region:, bucket:, waifu:)
       @image_url = image_url
-      @aws_access_key_id = aws_access_key_id
-      @aws_secret_access_key = aws_secret_access_key
+      @access_key_id = access_key_id
+      @secret_access_key = secret_access_key
       @region = region
-      @endpoint = endpoint
-      @host = host
       @bucket = bucket
-      @root_dir = root_dir
       @waifu = waifu
     end
 
@@ -27,7 +24,7 @@ module ArthropodWaifu2x
         download_input!
 
         {
-          key: perform_scaling!
+          url: perform_scaling!
         }
       end
     end
@@ -41,9 +38,8 @@ module ArthropodWaifu2x
       Dir.chdir waifu do
         call_command("th #{waifu_bin} -m scale -i #{converted_path} -o #{scaled_path}")
       end
-      Pathname.new(root_dir).join("#{SecureRandom.uuid}.png").to_s.tap do |key|
-        upload(scaled_path, key)
-      end
+
+      upload(scaled_path, "#{SecureRandom.uuid}.png")
     end
 
     def waifu_bin
@@ -70,12 +66,9 @@ module ArthropodWaifu2x
     def storage
       @storage ||= Fog::Storage.new({
         provider:              'AWS',
-        aws_access_key_id:     aws_access_key_id,
-        aws_secret_access_key: aws_secret_access_key,
+        access_key_id:         access_key_id,
+        secret_access_key:     secret_access_key,
         region:                region,
-        endpoint:              endpoint,
-        host:                  host,
-        path_style:            true
       })
       @storage.directories.get(bucket)
     end
@@ -86,7 +79,7 @@ module ArthropodWaifu2x
           key: key,
           body: file,
         })
-      end
+      end.url(300)
     end
   end
 end

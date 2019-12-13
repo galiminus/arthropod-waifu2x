@@ -21,16 +21,23 @@ OptionParser.new do |opts|
   opts.on("-r", "--region [string]", "AWS region, default to the AWS_REGION environment variable") do |r|
     options[:region] = r
   end
+  opts.on("-b", "--bucket [string]", "AWS result bucket, default to the AWS_BUCKET environment variable") do |b|
+    options[:region] = b
+  end
   opts.on("-w", "--waifu [string]", "Waifu2X install directory, default to WAIFU environment variable or /opt/waifu2x") do |w|
     options[:waifu] = w
   end
-
 end.parse!
 
+access_key_id = options[:access_key_id] || ENV["AWS_ACCESS_KEY_ID"]
+secret_access_key = options[:secret_access_key] || ENV["AWS_SECRET_ACCESS_KEY"]
+region = options[:region] || ENV["AWS_REGION"]
+bucket = options[:bucket] || ENV["AWS_BUCKET"]
+
 client = Aws::SQS::Client.new({
-  access_key_id: options[:access_key_id] || ENV["AWS_ACCESS_KEY_ID"],
-  secret_access_key: options[:secret_access_key] || ENV["AWS_SECRET_ACCESS_KEY"],
-  region: options[:region] || ENV["AWS_REGION"],
+  access_key_id: access_key_id,
+  secret_access_key: secret_access_key,
+  region: region,
 })
 
 loop do
@@ -38,13 +45,10 @@ loop do
     ArthropodWaifu2x::Scaler.new({
       waifu: options[:waifu] || ENV["WAIFU"] || "/opt/waifu2x",
       image_url: request.body["image_url"],
-      aws_access_key_id: request.body["aws_access_key_id"],
-      aws_secret_access_key: request.body["aws_secret_access_key"],
-      region: request.body["region"],
-      endpoint: request.body["endpoint"],
-      host: request.body["host"],
-      root_dir: request.body["root_dir"],
-      bucket: request.body["bucket"],
+      access_key_id: access_key_id,
+      secret_access_key: secret_access_key,
+      region: region,
+      bucket: bucket
     }).perform!
   end
 end
