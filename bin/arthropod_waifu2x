@@ -21,7 +21,7 @@ OptionParser.new do |opts|
   opts.on("-r", "--region [string]", "AWS region, default to the AWS_REGION environment variable") do |r|
     options[:region] = r
   end
-  opts.on("-w", "--waifu [string]", "Waifu2X install directory, default to /opt/waifu2x") do |w|
+  opts.on("-w", "--waifu [string]", "Waifu2X install directory, default to WAIFU environment variable or /opt/waifu2x") do |w|
     options[:waifu] = w
   end
 
@@ -36,7 +36,7 @@ client = Aws::SQS::Client.new({
 loop do
   Arthropod::Server.pull(client: client, queue_name: options[:queue] || ENV["QUEUE_NAME"]) do |request|
     ArthropodWaifu2x::Encoder.new({
-      waifu: options[:waifu] || "/opt/waifu2x",
+      waifu: options[:waifu] || ENV["WAIFU"] || "/opt/waifu2x",
       image_url: request.body["image_url"],
       aws_access_key_id: request.body["aws_access_key_id"],
       aws_secret_access_key: request.body["aws_secret_access_key"],
