@@ -43,7 +43,7 @@ loop do
       region: request.body["region"],
       endpoint: request.body["endpoint"],
       host: request.body["host"],
-      root_url: request.body["root_url"],
+      root_dir: request.body["root_dir"],
       bucket: request.body["bucket"],
     }).perform!
   end
