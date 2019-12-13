@@ -78,8 +78,9 @@ module ArthropodWaifu2x
         storage.files.create({
           key: key,
           body: file,
+          public: true
         })
-      end.url(300)
+      end.public_url
     end
   end
 end
