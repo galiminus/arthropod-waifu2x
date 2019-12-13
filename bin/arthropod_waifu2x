@@ -35,7 +35,7 @@ client = Aws::SQS::Client.new({
 
 loop do
   Arthropod::Server.pull(client: client, queue_name: options[:queue] || ENV["QUEUE_NAME"]) do |request|
-    ArthropodWaifu2x::Encoder.new({
+    ArthropodWaifu2x::Scaler.new({
       waifu: options[:waifu] || ENV["WAIFU"] || "/opt/waifu2x",
       image_url: request.body["image_url"],
       aws_access_key_id: request.body["aws_access_key_id"],
