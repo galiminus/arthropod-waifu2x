@@ -6,17 +6,17 @@ require 'pathname'
 
 module ArthropodWaifu2x
   class Scaler
-    attr_reader :image_url, :aws_access_key_id, :aws_secret_access_key, :region, :endpoint, :host, :bucket, :root_dir
+    attr_reader :image_url, :aws_access_key_id, :aws_secret_access_key, :region, :endpoint, :host, :bucket, :root_dir, :waifu
 
-    def initialize(image_url:, root_dir:, aws_access_key_id:, aws_secret_access_key:, region:, endpoint:, host:, bucket:, root_dir:, waifu:)
+    def initialize(image_url:, aws_access_key_id:, aws_secret_access_key:, region:, endpoint:, host:, bucket:, root_dir:, waifu:)
       @image_url = image_url
       @aws_access_key_id = aws_access_key_id
       @aws_secret_access_key = aws_secret_access_key
       @region = region
       @endpoint = endpoint
       @host = host
-      @root_dir = root_dir
       @bucket = bucket
+      @root_dir = root_dir
       @waifu = waifu
     end
 
