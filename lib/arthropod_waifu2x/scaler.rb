@@ -68,11 +68,11 @@ module ArthropodWaifu2x
     end
 
     def model_options
-      if noise_level.present? && scale.present?
+      if noise_level && scale
         "-m noise_scale -noise_level #{Shellwords.escape(noise_level)}"
-      elsif scale.present?
+      elsif scale
         "-m scale"
-      elsif noise_level.present?
+      elsif noise_level
         "-m noise -noise_level #{Shellwords.escape(noise_level)}"
       else
         raise InvalidOptions
