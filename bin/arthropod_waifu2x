@@ -48,7 +48,9 @@ loop do
       access_key_id: access_key_id,
       secret_access_key: secret_access_key,
       region: region,
-      bucket: bucket
+      bucket: bucket,
+      scale: request.scale,
+      noise_level: request.noise_level
     }).perform!
   end
 end
