@@ -28,7 +28,9 @@ module ArthropodWaifu2x
         download_input!
 
         {
-          url: perform_scaling!
+          url: perform_scaling!,
+          noise_level: noise_level,
+          scale: scale
         }
       end
     end
