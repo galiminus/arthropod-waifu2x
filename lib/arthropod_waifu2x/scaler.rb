@@ -6,15 +6,19 @@ require 'pathname'
 
 module ArthropodWaifu2x
   class Scaler
-    attr_reader :image_url, :access_key_id, :secret_access_key, :region, :bucket, :waifu
+    class InvalidOptions < StandardError; end
 
-    def initialize(image_url:, access_key_id:, secret_access_key:, region:, bucket:, waifu:)
+    attr_reader :image_url, :access_key_id, :secret_access_key, :region, :bucket, :waifu, :scale, :noise_level
+
+    def initialize(image_url:, access_key_id:, secret_access_key:, region:, bucket:, waifu:, scale: true, noise_level: nil)
       @image_url = image_url
       @access_key_id = access_key_id
       @secret_access_key = secret_access_key
       @region = region
       @bucket = bucket
       @waifu = waifu
+      @scale = scale
+      @noise_level = noise_level
     end
 
     def perform!
@@ -36,7 +40,7 @@ module ArthropodWaifu2x
     def perform_scaling!
       call_command("convert #{input_path} #{converted_path}")
       Dir.chdir waifu do
-        call_command("th #{waifu_bin} -m scale -i #{converted_path} -o #{scaled_path}")
+        call_command("th #{waifu_bin} #{model_options} -i #{converted_path} -o #{scaled_path}")
       end
 
       upload(scaled_path, "#{SecureRandom.uuid}.png")
@@ -61,6 +65,18 @@ module ArthropodWaifu2x
     def call_command(command)
       system(command, out: File::NULL, err: File::NULL)
       raise if $?.to_i != 0
+    end
+
+    def model_options
+      if noise_level.present? && scale.present?
+        "-m noise_scale -noise_level #{Shellwords.escape(noise_level)}"
+      elsif scale.present?
+        "-m scale"
+      elsif noise_level.present?
+        "-m noise -noise_level #{Shellwords.escape(noise_level)}"
+      else
+        raise InvalidOptions
+      end
     end
 
     def storage
