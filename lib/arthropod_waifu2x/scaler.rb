@@ -8,9 +8,9 @@ module ArthropodWaifu2x
   class Scaler
     class InvalidOptions < StandardError; end
 
-    attr_reader :image_url, :access_key_id, :secret_access_key, :region, :bucket, :waifu, :scale, :noise_level, :cudnn
+    attr_reader :image_url, :access_key_id, :secret_access_key, :region, :bucket, :waifu, :scale, :noise_level, :cudnn, :model
 
-    def initialize(image_url:, access_key_id:, secret_access_key:, region:, bucket:, waifu:, scale: true, noise_level: nil, cudnn: false)
+    def initialize(image_url:, access_key_id:, secret_access_key:, region:, bucket:, waifu:, scale: true, noise_level: nil, cudnn: false, model: "anime")
       @image_url = image_url
       @access_key_id = access_key_id
       @secret_access_key = secret_access_key
@@ -20,6 +20,7 @@ module ArthropodWaifu2x
       @scale = scale
       @noise_level = noise_level
       @cudnn = cudnn
+      @model = model
     end
 
     def perform!
@@ -43,7 +44,7 @@ module ArthropodWaifu2x
     def perform_scaling!
       call_command("convert #{input_path} #{converted_path}")
       Dir.chdir waifu do
-        call_command("th #{waifu_bin} #{cudnn_option} #{model_options} -i #{converted_path} -o #{scaled_path}")
+        call_command("th #{waifu_bin} #{cudnn_option} #{model_options} #{transform_options} -i #{converted_path} -o #{scaled_path}")
       end
 
       upload(scaled_path, "#{SecureRandom.uuid}.png")
@@ -70,7 +71,7 @@ module ArthropodWaifu2x
       raise if $?.to_i != 0
     end
 
-    def model_options
+    def transform_options
       if noise_level && scale
         "-m noise_scale -noise_level #{Shellwords.escape(noise_level)}"
       elsif scale
@@ -79,6 +80,14 @@ module ArthropodWaifu2x
         "-m noise -noise_level #{Shellwords.escape(noise_level)}"
       else
         raise InvalidOptions
+      end
+    end
+
+    def model_options
+      if model == "photo"
+        "-model_dir models/photo"
+      else
+        ""
       end
     end
 

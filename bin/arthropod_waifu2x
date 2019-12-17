@@ -55,7 +55,8 @@ loop do
       bucket: bucket,
       scale: request.body["scale"],
       noise_level: request.body["noise_level"],
-      cudnn: cudnn
+      cudnn: cudnn,
+      model: request.body["model"]
     }).perform!
   end
 end
