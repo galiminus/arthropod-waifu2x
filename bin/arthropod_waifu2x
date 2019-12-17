@@ -27,12 +27,16 @@ OptionParser.new do |opts|
   opts.on("-w", "--waifu [string]", "Waifu2X install directory, default to WAIFU environment variable or /opt/waifu2x") do |w|
     options[:waifu] = w
   end
+  opts.on("-c", "--cudnn", "Use CUDNN (default to WAIFU_CUDNN, otherwise false)") do |w|
+    options[:waifu] = w
+  end
 end.parse!
 
 access_key_id = options[:access_key_id] || ENV["AWS_ACCESS_KEY_ID"]
 secret_access_key = options[:secret_access_key] || ENV["AWS_SECRET_ACCESS_KEY"]
 region = options[:region] || ENV["AWS_REGION"]
 bucket = options[:bucket] || ENV["AWS_BUCKET"]
+cudnn = options[:cudnn] || ENV["WAIFU_CUDNN"] == 'true'
 
 client = Aws::SQS::Client.new({
   access_key_id: access_key_id,
@@ -50,7 +54,8 @@ loop do
       region: region,
       bucket: bucket,
       scale: request.body["scale"],
-      noise_level: request.body["noise_level"]
+      noise_level: request.body["noise_level"],
+      cudnn: cudnn
     }).perform!
   end
 end
