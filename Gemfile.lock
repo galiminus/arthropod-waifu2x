@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     arthropod_waifu2x (0.0.1)
-      arthropod (= 0.0.4)
+      arthropod (= 0.0.5)
       aws-sdk-sqs
       fog-aws
       foreman
@@ -10,7 +10,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    arthropod (0.0.4)
+    arthropod (0.0.5)
       aws-sdk-sqs
     aws-eventstream (1.0.3)
     aws-partitions (1.262.0)
